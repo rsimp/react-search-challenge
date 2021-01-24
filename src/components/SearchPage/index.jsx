@@ -1,18 +1,22 @@
 import React from 'react';
-import { ProfileContext } from './ProfilesContextProvider';
-import MinimalButton from './MinimalButton';
-import Header from './Header';
-import SearchCard from './SearchCard';
+
+import { ProfileContext } from 'components/ProfilesContextProvider';
+
+import MinimalButton from 'components/MinimalButton';
+import Header from 'components/Header';
+import SearchCard from 'components/SearchCard';
+
+import { sortProfilesAsc, sortProfilesDesc } from './actions';
 
 class SearchPage extends React.Component {
   static contextType = ProfileContext;
 
   handleSortAscending = () => {
-    this.context.dispatch({ type: 'ascending' });
+    this.context.dispatch(sortProfilesAsc());
   };
 
   handleSortDescending = () => {
-    this.context.dispatch({ type: 'descending' });
+    this.context.dispatch(sortProfilesDesc());
   };
 
   render() {

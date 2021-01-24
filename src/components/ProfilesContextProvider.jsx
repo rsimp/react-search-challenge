@@ -1,28 +1,34 @@
 import React from 'react';
+import { combineReducers, createReducer } from '@reduxjs/toolkit';
+
+import { sortProfilesAsc, sortProfilesDesc } from 'components/SearchPage/actions';
 import mockProfiles from '../profiles.json';
 
-export const ProfileContext = React.createContext({
-  profiles: [],
+const initialQueryState = {
+  initial: true,
+  loading: false,
+  error: null,
+};
+const initialPollingState = {
+  ...initialQueryState,
+  secondsRemaining: 10,
+};
+const ProfilesReducer = combineReducers({
+  profiles: createReducer([], (builder) => {
+    builder.addCase(sortProfilesAsc, (profiles) =>
+      profiles.sort((profileA, profileB) => (profileA.handle > profileB.handle ? 1 : -1))
+    );
+    builder.addCase(sortProfilesDesc, (profiles) =>
+      profiles.sort((profileA, profileB) => (profileA.handle < profileB.handle ? 1 : -1))
+    );
+  }),
+  queries: combineReducers({
+    fetchProfiles: createReducer(initialQueryState, (fetchProgress) => fetchProgress),
+    pollProfiles: createReducer(initialPollingState, (pollingProgress) => pollingProgress),
+  }),
 });
 
-function ProfilesReducer(state, action) {
-  let profiles;
-
-  switch (action.type) {
-    case 'ascending':
-      profiles = [...state.profiles];
-      profiles.sort((profileA, profileB) => (profileA.handle > profileB.handle ? 1 : -1));
-      return { profiles };
-
-    case 'descending':
-      profiles = [...state.profiles];
-      profiles.sort((profileA, profileB) => (profileA.handle < profileB.handle ? 1 : -1));
-      return { profiles };
-
-    default:
-      throw new Error();
-  }
-}
+export const ProfileContext = React.createContext();
 
 function ProfilesContextProvider({ children }) {
   const [state, dispatch] = React.useReducer(ProfilesReducer, {
