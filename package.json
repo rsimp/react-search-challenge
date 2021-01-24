@@ -36,6 +36,7 @@
     "@types/react-dom": "^16.9.9",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "http-proxy-middleware": "^1.0.6",
     "prettier": "^2.1.2"
   },
   "eslintConfig": {

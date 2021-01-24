@@ -7,9 +7,18 @@ import Header from 'components/Header';
 import SearchCard from 'components/SearchCard';
 
 import { sortProfilesAsc, sortProfilesDesc } from './actions';
+import { loadProfiles } from './async';
 
+// not a fan of class components rather just use hooks
 class SearchPage extends React.Component {
   static contextType = ProfileContext;
+
+  componentDidMount() {
+    const { queries } = this.context;
+    if (queries.fetchProfiles.initial) {
+      loadProfiles(this.context.dispatch, this.context);
+    }
+  }
 
   handleSortAscending = () => {
     this.context.dispatch(sortProfilesAsc());
