@@ -1,11 +1,11 @@
 import React from 'react';
 import styled from 'styled-components/macro';
+import { Link } from 'react-router-dom';
 
 import { ProfileContext } from 'context/ProfilesContextProvider';
 import { areProfilesLoaded, getLoadProfilesError, getProfiles } from 'context/selectors';
 
 import MinimalButton from 'components/MinimalButton';
-import Header from 'components/Header';
 import SearchCard from 'components/SearchCard';
 
 import { sortProfilesAsc, sortProfilesDesc } from './actions';
@@ -59,14 +59,16 @@ class SearchPage extends React.Component {
     }
 
     return profiles.map((profile) => (
-      <SearchCard
-        key={profile.id}
-        photoUrl={profile.photoUrl}
-        handle={profile.handle}
-        location={profile.location}
-        age={profile.age}
-        photoCount={profile.photoCount}
-      />
+      <Link to={`/profile/${profile.id}`}>
+        <SearchCard
+          key={profile.id}
+          photoUrl={profile.photoUrl}
+          handle={profile.handle}
+          location={profile.location}
+          age={profile.age}
+          photoCount={profile.photoCount}
+        />
+      </Link>
     ));
   }
 
@@ -74,27 +76,23 @@ class SearchPage extends React.Component {
     const profiles = getProfiles(this.context);
 
     return (
-      <React.Fragment>
-        <Header />
+      <Main>
+        <SearchControlsRow>
+          <MinimalButton disabled>
+            <img src="filter.svg" width={22} alt="filter" />
+          </MinimalButton>
 
-        <Main>
-          <SearchControlsRow>
-            <MinimalButton disabled>
-              <img src="filter.svg" width={22} alt="filter" />
-            </MinimalButton>
+          <MinimalButton disabled={profiles.length} onClick={this.handleSortAscending}>
+            <img src="./ascending.svg" width={22} alt="Sort ascending" />
+          </MinimalButton>
 
-            <MinimalButton disabled={profiles.length} onClick={this.handleSortAscending}>
-              <img src="./ascending.svg" width={22} alt="Sort ascending" />
-            </MinimalButton>
+          <MinimalButton disabled={profiles.length} onClick={this.handleSortDescending}>
+            <img src="./descending.svg" width={22} alt="Sort descending" />
+          </MinimalButton>
+        </SearchControlsRow>
 
-            <MinimalButton disabled={profiles.length} onClick={this.handleSortDescending}>
-              <img src="./descending.svg" width={22} alt="Sort descending" />
-            </MinimalButton>
-          </SearchControlsRow>
-
-          <SearchCardContainer>{this.renderProfiles(profiles)}</SearchCardContainer>
-        </Main>
-      </React.Fragment>
+        <SearchCardContainer>{this.renderProfiles(profiles)}</SearchCardContainer>
+      </Main>
     );
   }
 }
