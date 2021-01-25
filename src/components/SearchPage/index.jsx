@@ -34,6 +34,7 @@ const SearchCardsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 40px;
+  margin-top: 16px;
   @media screen and (max-width: 500px) {
     justify-content: center;
   }
