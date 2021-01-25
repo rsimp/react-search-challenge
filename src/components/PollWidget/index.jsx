@@ -35,6 +35,7 @@ export default function PollWidget(props) {
   const pollInterval = getPollInterval(context);
   const countdownText = getCountdownText(context);
 
+  // this seems much easier with sagas, much cleaner code too
   useEffect(() => {
     abortController.current.abort();
     if (isAutoFetchEnabled) {
