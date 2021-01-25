@@ -31,7 +31,6 @@ export default function PollWidget(props) {
   const contextRef = useRef();
   contextRef.current = context;
 
-  console.log(context);
   const isAutoFetchEnabled = getAutoFetchProfiles(context);
   const pollInterval = getPollInterval(context);
   const countdownText = getCountdownText(context);
