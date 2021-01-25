@@ -22,8 +22,9 @@ const initialPollingState = {
 // good example of a top level reducer slice
 const ProfilesReducer = combineReducers({
   authToken: createReducer('Bearer: AbCdEf123456', (token) => token),
+
   profiles: createReducer([], (builder) => {
-    // these two cases really ought to be a selector
+    // these two cases really ought to be query parameters
     builder.addCase(sortProfilesAsc, (profiles) =>
       profiles.sort((profileA, profileB) => (profileA.handle > profileB.handle ? 1 : -1))
     );
@@ -32,11 +33,13 @@ const ProfilesReducer = combineReducers({
     );
     builder.addCase(loadProfilesSuccess, (_, action) => action.payload);
   }),
+
   queries: combineReducers({
     fetchProfiles: createReducer(initialQueryState, (builder) => {
       builder.addCase(requestLoadProfiles, (fetchProgress) => {
         fetchProgress.loading = true;
         fetchProgress.initial = false;
+        fetchProgress.error = false;
         return fetchProgress;
       });
       builder.addCase(loadProfilesError, (fetchProgress, action) => {
@@ -49,6 +52,7 @@ const ProfilesReducer = combineReducers({
         return fetchProgress;
       });
     }),
+
     pollProfiles: createReducer(initialPollingState, (pollingProgress) => pollingProgress),
   }),
 });

@@ -1,15 +1,9 @@
-import React from 'react';
+import styled from 'styled-components/macro';
 
-function MinimalButton({ children, onClick, style, ...props }) {
-  return (
-    <button
-      {...props}
-      onClick={onClick}
-      style={{ background: 'transparent', border: 0, cursor: 'pointer', margin: 8, ...style }}
-    >
-      {children}
-    </button>
-  );
-}
-
+const MinimalButton = styled.button`
+  background: transparent;
+  border: 0px;
+  cursor: pointer;
+  margin: 8px;
+`;
 export default MinimalButton;

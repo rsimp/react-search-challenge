@@ -13,6 +13,7 @@ export const loadProfiles = async (dispatch, state) => {
     const profiles = await profileBody.json();
     dispatch(loadProfilesSuccess(profiles));
   } catch (e) {
+    console.error(e);
     dispatch(loadProfilesError(e));
   }
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components/macro';
 
 import { ProfileContext } from 'components/ProfilesContextProvider';
 
@@ -10,7 +11,21 @@ import { sortProfilesAsc, sortProfilesDesc } from './actions';
 import { loadProfiles } from './async';
 import { areProfilesLoaded, getLoadError, getProfiles } from './selectors';
 
-// not a fan of class components rather just use hooks
+const Main = styled.main`
+  margin: 24px;
+`;
+
+const SearchControlsRow = styled.main`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const SearchCardContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-gap: 16px;
+`;
+
 class SearchPage extends React.Component {
   static contextType = ProfileContext;
 
@@ -61,8 +76,8 @@ class SearchPage extends React.Component {
       <React.Fragment>
         <Header />
 
-        <main style={{ margin: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Main>
+          <SearchControlsRow>
             <MinimalButton disabled>
               <img src="filter.svg" width={22} alt="filter" />
             </MinimalButton>
@@ -74,18 +89,10 @@ class SearchPage extends React.Component {
             <MinimalButton onClick={this.handleSortDescending}>
               <img src="./descending.svg" width={22} alt="Sort descending" />
             </MinimalButton>
-          </div>
+          </SearchControlsRow>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr',
-              gridGap: '16px',
-            }}
-          >
-            {this.renderProfiles(profiles)}
-          </div>
-        </main>
+          <SearchCardContainer>{this.renderProfiles(profiles)}</SearchCardContainer>
+        </Main>
       </React.Fragment>
     );
   }
