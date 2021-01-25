@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/macro';
+import { Link } from 'react-router-dom';
 
 const CardContainer = styled.div`
   display: flex;
@@ -43,22 +44,24 @@ const BottomInfoRow = styled.div`
   margin-right: 4px;
 `;
 
-export default class Search extends React.PureComponent {
+export default class SearchCard extends React.PureComponent {
   render() {
-    const { photoUrl = '', handle = '', location = '', age = 99, photoCount = 0 } = this.props;
+    const { photoUrl = '', handle = '', location = '', age = 99, photoCount = 0, id } = this.props;
 
     return (
       <CardContainer>
-        <Card>
-          <img src={photoUrl} alt="potential date"></img>
-          <CardOverlay>
-            <HandleWrapper>{handle}</HandleWrapper>
-            <BottomInfoRow>
-              <span>{location ? `${age} • ${location}` : age}</span>
-              {photoCount > 1 && <span>{photoCount}</span>}
-            </BottomInfoRow>
-          </CardOverlay>
-        </Card>
+        <Link to={`/profile/${id}`}>
+          <Card>
+            <img src={photoUrl} alt="potential date"></img>
+            <CardOverlay>
+              <HandleWrapper>{handle}</HandleWrapper>
+              <BottomInfoRow>
+                <span>{location ? `${age} • ${location}` : age}</span>
+                {photoCount > 1 && <span>{photoCount}</span>}
+              </BottomInfoRow>
+            </CardOverlay>
+          </Card>
+        </Link>
       </CardContainer>
     );
   }

@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components/macro';
-import { Link } from 'react-router-dom';
 
 import { ProfilesContext } from 'context/ProfilesContextProvider';
 import {
@@ -24,16 +23,20 @@ const Main = styled.main`
 const SearchControlsRow = styled.div`
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 `;
 
 const LeftSearchControls = styled.div`
   margin-right: auto;
 `;
 
-const SearchCardContainer = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-gap: 16px;
+const SearchCardsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  @media screen and (max-width: 500px) {
+    justify-content: center;
+  }
 `;
 
 class SearchPage extends React.Component {
@@ -69,15 +72,15 @@ class SearchPage extends React.Component {
     }
 
     return profiles.map((profile) => (
-      <Link to={`/profile/${profile.id}`} key={profile.id}>
-        <SearchCard
-          photoUrl={profile.photoUrl}
-          handle={profile.handle}
-          location={profile.location}
-          age={profile.age}
-          photoCount={profile.photoCount}
-        />
-      </Link>
+      <SearchCard
+        key={profile.id}
+        id={profile.id}
+        photoUrl={profile.photoUrl}
+        handle={profile.handle}
+        location={profile.location}
+        age={profile.age}
+        photoCount={profile.photoCount}
+      />
     ));
   }
 
@@ -103,7 +106,7 @@ class SearchPage extends React.Component {
           </MinimalButton>
         </SearchControlsRow>
 
-        <SearchCardContainer>{this.renderProfiles(profiles)}</SearchCardContainer>
+        <SearchCardsContainer>{this.renderProfiles(profiles)}</SearchCardsContainer>
       </Main>
     );
   }
