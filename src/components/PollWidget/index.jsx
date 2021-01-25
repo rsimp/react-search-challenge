@@ -28,6 +28,10 @@ const Label = styled.label`
 export default function PollWidget(props) {
   const context = useContext(ProfilesContext);
   const abortController = useRef(new AbortController());
+
+  // hack to get around some linting rules, what I really need is something like
+  // getState, I think at this point it just makes more sense to connect in redux
+  // and use thunks (or sagas)
   const contextRef = useRef();
   contextRef.current = context;
 
