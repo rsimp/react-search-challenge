@@ -1,3 +1,5 @@
+import { getAuthToken } from 'context/selectors';
+
 import { requestLoadProfiles, loadProfilesSuccess, loadProfilesError } from './actions';
 
 export const loadProfiles = async (dispatch, state) => {
@@ -6,7 +8,7 @@ export const loadProfiles = async (dispatch, state) => {
     const profileBody = await fetch('/api/profiles', {
       method: 'get',
       headers: new Headers({
-        Authorization: state.authToken,
+        Authorization: getAuthToken(state),
         'Content-Type': 'application/json',
       }),
     });

@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components/macro';
 
-import { ProfileContext } from 'components/ProfilesContextProvider';
+import { ProfileContext } from 'context/ProfilesContextProvider';
+import { areProfilesLoaded, getLoadProfilesError, getProfiles } from 'context/selectors';
 
 import MinimalButton from 'components/MinimalButton';
 import Header from 'components/Header';
@@ -9,7 +10,6 @@ import SearchCard from 'components/SearchCard';
 
 import { sortProfilesAsc, sortProfilesDesc } from './actions';
 import { loadProfiles } from './async';
-import { areProfilesLoaded, getLoadError, getProfiles } from './selectors';
 
 const Main = styled.main`
   margin: 24px;
@@ -44,11 +44,12 @@ class SearchPage extends React.Component {
   };
 
   renderProfiles(profiles) {
+    // TODO have all non card messages centered with larger font
     if (!areProfilesLoaded(this.context)) {
       return 'loading profiles...';
     }
 
-    const loadError = getLoadError(this.context);
+    const loadError = getLoadProfilesError(this.context);
     if (loadError) {
       return loadError.message;
     }
@@ -82,11 +83,11 @@ class SearchPage extends React.Component {
               <img src="filter.svg" width={22} alt="filter" />
             </MinimalButton>
 
-            <MinimalButton onClick={this.handleSortAscending}>
+            <MinimalButton disabled={profiles.length} onClick={this.handleSortAscending}>
               <img src="./ascending.svg" width={22} alt="Sort ascending" />
             </MinimalButton>
 
-            <MinimalButton onClick={this.handleSortDescending}>
+            <MinimalButton disabled={profiles.length} onClick={this.handleSortDescending}>
               <img src="./descending.svg" width={22} alt="Sort descending" />
             </MinimalButton>
           </SearchControlsRow>

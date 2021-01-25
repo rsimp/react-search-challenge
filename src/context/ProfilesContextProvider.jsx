@@ -21,8 +21,6 @@ const initialPollingState = {
 
 // good example of a top level reducer slice
 const ProfilesReducer = combineReducers({
-  authToken: createReducer('Bearer: AbCdEf123456', (token) => token),
-
   profiles: createReducer([], (builder) => {
     // these two cases really ought to be query parameters
     builder.addCase(sortProfilesAsc, (profiles) =>
@@ -35,7 +33,7 @@ const ProfilesReducer = combineReducers({
   }),
 
   queries: combineReducers({
-    fetchProfiles: createReducer(initialQueryState, (builder) => {
+    loadProfiles: createReducer(initialQueryState, (builder) => {
       builder.addCase(requestLoadProfiles, (fetchProgress) => {
         fetchProgress.loading = true;
         fetchProgress.initial = false;
@@ -65,7 +63,9 @@ function ProfilesContextProvider({ children }) {
   const [state, dispatch] = React.useReducer(ProfilesReducer, initialState);
 
   return (
-    <ProfileContext.Provider value={{ ...state, dispatch }}>{children}</ProfileContext.Provider>
+    <ProfileContext.Provider value={{ ...state, dispatch, authToken: 'Bearer: AbCdEf123456' }}>
+      {children}
+    </ProfileContext.Provider>
   );
 }
 
