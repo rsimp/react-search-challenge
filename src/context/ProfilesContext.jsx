@@ -65,10 +65,19 @@ const ProfilesReducer = combineReducers({
       });
       builder.addCase(loadProfilesSuccess, (fetchProgress, action) => {
         fetchProgress.loading = false;
+        fetchProgress.error = null;
+        return fetchProgress;
+      });
+
+      //need to wipe out any old errors
+      builder.addCase(pollProfilesSuccess, (fetchProgress, action) => {
+        fetchProgress.loading = false;
+        fetchProgress.error = null;
         return fetchProgress;
       });
     }),
 
+    // these may not be necessary, keeping in case useful later
     pollProfiles: createReducer({ loading: false, error: null }, (builder) => {
       builder.addCase(requestPollProfiles, (fetchProgress) => {
         fetchProgress.loading = true;
