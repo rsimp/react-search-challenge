@@ -1,15 +1,15 @@
 import React from 'react';
 import styled from 'styled-components/macro';
 
-import { ProfileContext } from 'components/ProfilesContextProvider';
+import { AppStateContext } from 'core/AppState';
 
-import MinimalButton from 'components/MinimalButton';
-import Header from 'components/Header';
-import SearchCard from 'components/SearchCard';
+import MinimalButton from 'app/MinimalButton';
+import Header from 'app/Header';
+import SearchCard from 'app/search/SearchCard';
 
-import { sortProfilesAsc, sortProfilesDesc } from './actions';
-import { loadProfiles } from './async';
-import { areProfilesLoaded, getLoadError, getProfiles } from './selectors';
+import { sortProfilesAsc, sortProfilesDesc } from './state/actions';
+import { loadProfiles } from './state/async';
+import { areProfilesLoaded, getLoadError, getProfiles } from './state/selectors';
 
 const Main = styled.main`
   margin: 24px;
@@ -27,7 +27,7 @@ const SearchCardContainer = styled.div`
 `;
 
 class SearchPage extends React.Component {
-  static contextType = ProfileContext;
+  static contextType = AppStateContext;
 
   componentDidMount() {
     if (!areProfilesLoaded(this.context)) {
@@ -45,15 +45,18 @@ class SearchPage extends React.Component {
 
   renderProfiles(profiles) {
     if (!areProfilesLoaded(this.context)) {
+      // TODO Center display
       return 'loading profiles...';
     }
 
     const loadError = getLoadError(this.context);
     if (loadError) {
+      // TODO Center display
       return loadError.message;
     }
 
     if (profiles.length === 0) {
+      // TODO Center display
       return 'No matches found';
     }
 
@@ -82,11 +85,11 @@ class SearchPage extends React.Component {
               <img src="filter.svg" width={22} alt="filter" />
             </MinimalButton>
 
-            <MinimalButton onClick={this.handleSortAscending}>
+            <MinimalButton disabled={profiles.length} onClick={this.handleSortAscending}>
               <img src="./ascending.svg" width={22} alt="Sort ascending" />
             </MinimalButton>
 
-            <MinimalButton onClick={this.handleSortDescending}>
+            <MinimalButton disabled={profiles.length} onClick={this.handleSortDescending}>
               <img src="./descending.svg" width={22} alt="Sort descending" />
             </MinimalButton>
           </SearchControlsRow>
