@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components/macro';
 import Switch from 'react-switch';
 
-import { ProfilesContext } from 'context/ProfilesContextProvider';
+import { ProfilesContext } from 'context/ProfilesContext';
 import { getAutoFetchProfiles, getPollInterval, getCountdownText } from 'context/selectors';
 
 import { setAutoFetch } from './actions';

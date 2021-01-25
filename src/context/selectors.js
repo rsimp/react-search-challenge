@@ -6,7 +6,7 @@ export const areProfilesLoaded = (state) => {
     queries: { loadProfiles },
     profiles,
   } = state;
-  return !loadProfiles.initial && (!loadProfiles.error || profiles.length > 0);
+  return !loadProfiles.initial && (!loadProfiles.loading || profiles.length > 0);
 };
 
 export const hasLoadProfilesResolved = (state) => {
@@ -20,3 +20,6 @@ export const getLoadProfilesError = (state) => state.queries.loadProfiles?.error
 export const getAutoFetchProfiles = (state) => state.autoFetchProfiles;
 export const getPollInterval = (state) => state.pollInterval;
 export const getCountdownText = (state) => state.countdownText;
+
+export const getProfileById = (state, id) =>
+  state.profiles.find((profile) => profile.id === Number(id));

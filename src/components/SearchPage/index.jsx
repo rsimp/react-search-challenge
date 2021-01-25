@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/macro';
 
-import { ProfilesContext } from 'context/ProfilesContextProvider';
+import { ProfilesContext } from 'context/ProfilesContext';
 import {
   areProfilesLoaded,
   getLoadProfilesError,
