@@ -5,7 +5,7 @@ import SearchPage from 'components/SearchPage';
 import Header from 'components/Header';
 import ProfilePage from 'components/ProfilePage';
 
-import ProfilesContextProvider from 'context/ProfilesContextProvider';
+import { ProfilesContextProvider } from 'context/ProfilesContextProvider';
 
 import './styles.css';
 

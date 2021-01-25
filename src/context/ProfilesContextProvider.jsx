@@ -8,19 +8,36 @@ import {
   loadProfilesError,
   loadProfilesSuccess,
 } from 'components/SearchPage/actions';
+import {
+  setAutoFetch,
+  setCountdownText,
+  pollProfilesSuccess,
+  pollProfilesError,
+  requestPollProfiles,
+} from 'components/PollWidget/actions';
 
 const initialQueryState = {
   initial: true,
   loading: false,
   error: null,
 };
-const initialPollingState = {
-  ...initialQueryState,
-  secondsRemaining: 10,
-};
+
+const payloadReducer = (_, action) => action.payload;
+const valueReducer = (value) => () => value;
 
 // good example of a top level reducer slice
 const ProfilesReducer = combineReducers({
+  autoFetchProfiles: createReducer(false, (builder) => {
+    builder.addCase(setAutoFetch, payloadReducer);
+    builder.addCase(loadProfilesSuccess, valueReducer(true));
+    builder.addCase(loadProfilesError, valueReducer(true));
+  }),
+
+  countdownText: createReducer('', (builder) => {
+    builder.addCase(setCountdownText, payloadReducer);
+    builder.addCase(setAutoFetch, (_, action) => (action.payload ? '10' : ''));
+  }),
+
   profiles: createReducer([], (builder) => {
     // these two cases really ought to be query parameters
     builder.addCase(sortProfilesAsc, (profiles) =>
@@ -29,7 +46,8 @@ const ProfilesReducer = combineReducers({
     builder.addCase(sortProfilesDesc, (profiles) =>
       profiles.sort((profileA, profileB) => (profileA.handle < profileB.handle ? 1 : -1))
     );
-    builder.addCase(loadProfilesSuccess, (_, action) => action.payload);
+    builder.addCase(loadProfilesSuccess, payloadReducer);
+    builder.addCase(pollProfilesSuccess, payloadReducer);
   }),
 
   queries: combineReducers({
@@ -51,22 +69,38 @@ const ProfilesReducer = combineReducers({
       });
     }),
 
-    pollProfiles: createReducer(initialPollingState, (pollingProgress) => pollingProgress),
+    pollProfiles: createReducer({ loading: false, error: null }, (builder) => {
+      builder.addCase(requestPollProfiles, (fetchProgress) => {
+        fetchProgress.loading = true;
+        fetchProgress.error = null;
+        return fetchProgress;
+      });
+      builder.addCase(pollProfilesError, (fetchProgress, action) => {
+        fetchProgress.loading = false;
+        fetchProgress.error = action.payload;
+        return fetchProgress;
+      });
+      builder.addCase(pollProfilesSuccess, (fetchProgress, action) => {
+        fetchProgress.loading = false;
+        fetchProgress.error = null;
+        return fetchProgress;
+      });
+    }),
   }),
 });
 
-export const ProfileContext = React.createContext();
+export const ProfilesContext = React.createContext();
 const initialState = ProfilesReducer(undefined, { type: '__initialize__' });
 
 // this part might as well just use redux
-function ProfilesContextProvider({ children }) {
+export function ProfilesContextProvider({ children }) {
   const [state, dispatch] = React.useReducer(ProfilesReducer, initialState);
 
   return (
-    <ProfileContext.Provider value={{ ...state, dispatch, authToken: 'Bearer: AbCdEf123456' }}>
+    <ProfilesContext.Provider
+      value={{ ...state, dispatch, authToken: 'Bearer: AbCdEf123456', pollInterval: 10 }}
+    >
       {children}
-    </ProfileContext.Provider>
+    </ProfilesContext.Provider>
   );
 }
-
-export default ProfilesContextProvider;

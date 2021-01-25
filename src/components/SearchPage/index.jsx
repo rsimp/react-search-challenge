@@ -2,11 +2,17 @@ import React from 'react';
 import styled from 'styled-components/macro';
 import { Link } from 'react-router-dom';
 
-import { ProfileContext } from 'context/ProfilesContextProvider';
-import { areProfilesLoaded, getLoadProfilesError, getProfiles } from 'context/selectors';
+import { ProfilesContext } from 'context/ProfilesContextProvider';
+import {
+  areProfilesLoaded,
+  getLoadProfilesError,
+  getProfiles,
+  hasLoadProfilesResolved,
+} from 'context/selectors';
 
 import MinimalButton from 'components/MinimalButton';
 import SearchCard from 'components/SearchCard';
+import PollWidget from 'components/PollWidget';
 
 import { sortProfilesAsc, sortProfilesDesc } from './actions';
 import { loadProfiles } from './async';
@@ -15,9 +21,13 @@ const Main = styled.main`
   margin: 24px;
 `;
 
-const SearchControlsRow = styled.main`
+const SearchControlsRow = styled.div`
   display: flex;
   justify-content: flex-end;
+`;
+
+const LeftSearchControls = styled.div`
+  margin-right: auto;
 `;
 
 const SearchCardContainer = styled.div`
@@ -27,7 +37,7 @@ const SearchCardContainer = styled.div`
 `;
 
 class SearchPage extends React.Component {
-  static contextType = ProfileContext;
+  static contextType = ProfilesContext;
 
   componentDidMount() {
     if (!areProfilesLoaded(this.context)) {
@@ -59,9 +69,8 @@ class SearchPage extends React.Component {
     }
 
     return profiles.map((profile) => (
-      <Link to={`/profile/${profile.id}`}>
+      <Link to={`/profile/${profile.id}`} key={profile.id}>
         <SearchCard
-          key={profile.id}
           photoUrl={profile.photoUrl}
           handle={profile.handle}
           location={profile.location}
@@ -78,6 +87,9 @@ class SearchPage extends React.Component {
     return (
       <Main>
         <SearchControlsRow>
+          <LeftSearchControls>
+            <PollWidget disabled={!hasLoadProfilesResolved(this.context)} />
+          </LeftSearchControls>
           <MinimalButton disabled>
             <img src="filter.svg" width={22} alt="filter" />
           </MinimalButton>
