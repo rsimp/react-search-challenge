@@ -8,14 +8,14 @@ import SearchCard from 'components/SearchCard';
 
 import { sortProfilesAsc, sortProfilesDesc } from './actions';
 import { loadProfiles } from './async';
+import { areProfilesLoaded, getLoadError, getProfiles } from './selectors';
 
 // not a fan of class components rather just use hooks
 class SearchPage extends React.Component {
   static contextType = ProfileContext;
 
   componentDidMount() {
-    const { queries } = this.context;
-    if (queries.fetchProfiles.initial) {
+    if (!areProfilesLoaded(this.context)) {
       loadProfiles(this.context.dispatch, this.context);
     }
   }
@@ -28,8 +28,34 @@ class SearchPage extends React.Component {
     this.context.dispatch(sortProfilesDesc());
   };
 
+  renderProfiles(profiles) {
+    if (!areProfilesLoaded(this.context)) {
+      return 'loading profiles...';
+    }
+
+    const loadError = getLoadError(this.context);
+    if (loadError) {
+      return loadError.message;
+    }
+
+    if (profiles.length === 0) {
+      return 'No matches found';
+    }
+
+    return profiles.map((profile) => (
+      <SearchCard
+        key={profile.id}
+        photoUrl={profile.photoUrl}
+        handle={profile.handle}
+        location={profile.location}
+        age={profile.age}
+        photoCount={profile.photoCount}
+      />
+    ));
+  }
+
   render() {
-    const { profiles = [] } = this.context;
+    const profiles = getProfiles(this.context);
 
     return (
       <React.Fragment>
@@ -57,16 +83,7 @@ class SearchPage extends React.Component {
               gridGap: '16px',
             }}
           >
-            {profiles.map((profile) => (
-              <SearchCard
-                key={profile.id}
-                photoUrl={profile.photoUrl}
-                handle={profile.handle}
-                location={profile.location}
-                age={profile.age}
-                photoCount={profile.photoCount}
-              />
-            ))}
+            {this.renderProfiles(profiles)}
           </div>
         </main>
       </React.Fragment>
