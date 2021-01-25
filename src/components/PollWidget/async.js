@@ -8,8 +8,8 @@ import { getAuthToken, getPollInterval } from 'context/selectors';
 
 export const pollProfiles = async (context, abortController, secondsLeft) => {
   if (!abortController.signal.aborted) {
+    context.dispatch(setCountdownText(`${secondsLeft}`));
     if (secondsLeft === 0) {
-      context.dispatch(setCountdownText('Loading...'));
       context.dispatch(requestPollProfiles());
       try {
         const profileBody = await fetch('/api/profiles', {
@@ -28,7 +28,6 @@ export const pollProfiles = async (context, abortController, secondsLeft) => {
       }
       pollProfiles(context, abortController, getPollInterval(context));
     } else {
-      context.dispatch(setCountdownText(`${secondsLeft}`));
       setTimeout(() => pollProfiles(context, abortController, secondsLeft - 1), 1000);
     }
   }

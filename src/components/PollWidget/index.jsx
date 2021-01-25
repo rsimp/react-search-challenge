@@ -47,7 +47,7 @@ export default function PollWidget(props) {
   return (
     <WidgetContainer>
       <Label>
-        <span>Auto-Refetch</span>
+        <span>Auto-fetch</span>
         <Switch
           disabled={props.disabled}
           onChange={(checked) => context.dispatch(setAutoFetch(checked))}
