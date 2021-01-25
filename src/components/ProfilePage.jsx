@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components/macro';
 
 import { ProfilesContext } from 'context/ProfilesContext';
-import { getProfileById, areProfilesLoaded } from 'context/selectors';
+import { getProfileById, areProfilesLoaded, getLoadProfilesError } from 'context/selectors';
 
 import { loadProfiles } from 'components/SearchPage/async';
+import { ScreenMessage, ErrorMessage } from 'components/ScreenMessages';
 
 const Main = styled.div`
   display: flex;
@@ -85,7 +86,7 @@ const SummaryText = styled.div`
   margin-top: 24px;
 `;
 
-export default function SearchPage() {
+export default function ProfilePage() {
   const { id } = useParams();
   const context = useContext(ProfilesContext);
   const profilesLoaded = areProfilesLoaded(context);
@@ -94,10 +95,16 @@ export default function SearchPage() {
     if (!profilesLoaded) {
       loadProfiles(context.dispatch, context);
     }
-  }, []);
+  }, []); // eslint-disable-line
 
   if (!profilesLoaded) {
-    return 'Loading...';
+    // TODO replace with a skeleton screen
+    return <ScreenMessage>Loading...</ScreenMessage>;
+  }
+
+  const loadError = getLoadProfilesError(context);
+  if (loadError) {
+    return <ErrorMessage>An error occured loading profiles</ErrorMessage>;
   }
 
   const { photoUrl, location, age, handle } = getProfileById(context, id);

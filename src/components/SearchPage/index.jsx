@@ -12,12 +12,16 @@ import {
 import MinimalButton from 'components/MinimalButton';
 import SearchCard from 'components/SearchCard';
 import PollWidget from 'components/PollWidget';
+import { ScreenMessage, ErrorMessage } from 'components/ScreenMessages';
 
 import { sortProfilesAsc, sortProfilesDesc } from './actions';
 import { loadProfiles } from './async';
 
 const Main = styled.main`
   margin: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 `;
 
 const SearchControlsRow = styled.div`
@@ -58,18 +62,18 @@ class SearchPage extends React.Component {
   };
 
   renderProfiles(profiles) {
-    // TODO have all non card messages centered with larger font
     if (!areProfilesLoaded(this.context)) {
-      return 'loading profiles...';
+      // TODO skeleton screens would be pretty nice here, less flicker too
+      return <ScreenMessage>Loading profiles...</ScreenMessage>;
     }
 
     const loadError = getLoadProfilesError(this.context);
     if (loadError) {
-      return loadError.message;
+      return <ErrorMessage>An error occured loading profiles</ErrorMessage>;
     }
 
     if (profiles.length === 0) {
-      return 'No matches found';
+      return <ScreenMessage>No matches found</ScreenMessage>;
     }
 
     return profiles.map((profile) => (
