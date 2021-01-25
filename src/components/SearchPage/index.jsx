@@ -76,17 +76,21 @@ class SearchPage extends React.Component {
       return <ScreenMessage>No matches found</ScreenMessage>;
     }
 
-    return profiles.map((profile) => (
-      <SearchCard
-        key={profile.id}
-        id={profile.id}
-        photoUrl={profile.photoUrl}
-        handle={profile.handle}
-        location={profile.location}
-        age={profile.age}
-        photoCount={profile.photoCount}
-      />
-    ));
+    return (
+      <SearchCardsContainer>
+        {profiles.map((profile) => (
+          <SearchCard
+            key={profile.id}
+            id={profile.id}
+            photoUrl={profile.photoUrl}
+            handle={profile.handle}
+            location={profile.location}
+            age={profile.age}
+            photoCount={profile.photoCount}
+          />
+        ))}
+      </SearchCardsContainer>
+    );
   }
 
   render() {
@@ -111,7 +115,7 @@ class SearchPage extends React.Component {
           </MinimalButton>
         </SearchControlsRow>
 
-        <SearchCardsContainer>{this.renderProfiles(profiles)}</SearchCardsContainer>
+        {this.renderProfiles(profiles)}
       </Main>
     );
   }
