@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 
-import { ProfilesContext } from 'context/ProfilesContext';
 import {
-  areProfilesLoaded,
+  getAreProfilesLoaded,
   getLoadProfilesError,
   getProfiles,
-  hasLoadProfilesResolved,
-} from 'context/selectors';
+  getHasLoadProfilesResolved,
+} from 'store/profiles/selectors';
 
 import MinimalButton from 'components/MinimalButton';
 import SearchCard from 'components/SearchCard';
@@ -15,7 +15,7 @@ import PollWidget from 'components/PollWidget';
 import { ScreenMessage, ErrorMessage } from 'components/ScreenMessages';
 
 import { sortProfilesAsc, sortProfilesDesc } from './actions';
-import { loadProfiles } from './async';
+import { loadProfilesThunk } from './async';
 
 const Main = styled.main`
   margin: 24px;
@@ -44,31 +44,27 @@ const SearchCardsContainer = styled.div`
   }
 `;
 
-class SearchPage extends React.Component {
-  static contextType = ProfilesContext;
+export const SearchPage = React.memo(() => {
+  const dispatch = useDispatch();
 
-  componentDidMount() {
-    if (!areProfilesLoaded(this.context)) {
-      loadProfiles(this.context.dispatch, this.context);
+  const areProfilesLoaded = useSelector(getAreProfilesLoaded);
+  const hasLoadProfilesResolved = useSelector(getHasLoadProfilesResolved);
+  const loadProfilesError = useSelector(getLoadProfilesError);
+  const profiles = useSelector(getProfiles);
+
+  useEffect(() => {
+    if (!areProfilesLoaded) {
+      dispatch(loadProfilesThunk());
     }
-  }
+  }, [dispatch, areProfilesLoaded]);
 
-  handleSortAscending = () => {
-    this.context.dispatch(sortProfilesAsc());
-  };
-
-  handleSortDescending = () => {
-    this.context.dispatch(sortProfilesDesc());
-  };
-
-  renderProfiles(profiles) {
-    if (!areProfilesLoaded(this.context)) {
+  function renderProfiles() {
+    if (!areProfilesLoaded) {
       // TODO skeleton screens would be pretty nice here, less flicker too
       return <ScreenMessage>Loading profiles...</ScreenMessage>;
     }
 
-    const loadError = getLoadProfilesError(this.context);
-    if (loadError) {
+    if (loadProfilesError) {
       return <ErrorMessage>An error occured loading profiles</ErrorMessage>;
     }
 
@@ -93,32 +89,36 @@ class SearchPage extends React.Component {
     );
   }
 
-  render() {
-    const profiles = getProfiles(this.context);
+  const handleSortAscending = useCallback(() => {
+    dispatch(sortProfilesAsc());
+  }, [dispatch]);
 
-    return (
-      <Main>
-        <SearchControlsRow>
-          <LeftSearchControls>
-            <PollWidget disabled={!hasLoadProfilesResolved(this.context)} />
-          </LeftSearchControls>
-          <MinimalButton disabled>
-            <img src="filter.svg" width={22} alt="filter" />
-          </MinimalButton>
+  const handleSortDescending = useCallback(() => {
+    dispatch(sortProfilesDesc());
+  }, [dispatch]);
 
-          <MinimalButton disabled={profiles.length} onClick={this.handleSortAscending}>
-            <img src="./ascending.svg" width={22} alt="Sort ascending" />
-          </MinimalButton>
+  return (
+    <Main>
+      <SearchControlsRow>
+        <LeftSearchControls>
+          <PollWidget disabled={!hasLoadProfilesResolved} />
+        </LeftSearchControls>
+        <MinimalButton disabled>
+          <img src="filter.svg" width={22} alt="filter" />
+        </MinimalButton>
 
-          <MinimalButton disabled={profiles.length} onClick={this.handleSortDescending}>
-            <img src="./descending.svg" width={22} alt="Sort descending" />
-          </MinimalButton>
-        </SearchControlsRow>
+        <MinimalButton disabled={profiles.length} onClick={handleSortAscending}>
+          <img src="./ascending.svg" width={22} alt="Sort ascending" />
+        </MinimalButton>
 
-        {this.renderProfiles(profiles)}
-      </Main>
-    );
-  }
-}
+        <MinimalButton disabled={profiles.length} onClick={handleSortDescending}>
+          <img src="./descending.svg" width={22} alt="Sort descending" />
+        </MinimalButton>
+      </SearchControlsRow>
 
+      {renderProfiles(profiles)}
+    </Main>
+  );
+});
+SearchPage.displayName = 'SearchPage';
 export default SearchPage;

@@ -4,31 +4,37 @@ import {
   pollProfilesSuccess,
   setCountdownText,
 } from './actions';
-import { getAuthToken, getPollInterval } from 'context/selectors';
+import { getPollInterval } from 'store/profiles/selectors';
+import { getAuthToken } from 'store/login/selectors';
 
-export const pollProfiles = async (context, abortController, secondsLeft) => {
+export const pollProfilesThunk = (abortController, targetTime) => async (dispatch, getState) => {
+  const eventQueuePadding = 25; // wont be executed right on time so lets give some padding
+  const secondsLeft = Math.floor((targetTime - Date.now() + eventQueuePadding) / 1000);
   if (!abortController.signal.aborted) {
-    context.dispatch(setCountdownText(`${secondsLeft}`));
-    if (secondsLeft === 0) {
-      context.dispatch(requestPollProfiles());
+    dispatch(setCountdownText(`${secondsLeft}`));
+    if (secondsLeft <= 0) {
+      dispatch(requestPollProfiles());
       try {
         const profileBody = await fetch('/api/profiles', {
           method: 'get',
           headers: new Headers({
-            Authorization: getAuthToken(context),
+            Authorization: getAuthToken(getState()),
             'Content-Type': 'application/json',
           }),
           signal: abortController.signal,
         });
         const profiles = await profileBody.json();
-        context.dispatch(pollProfilesSuccess(profiles));
+        dispatch(pollProfilesSuccess(profiles));
       } catch (e) {
         console.error(e);
-        context.dispatch(pollProfilesError(e));
+        dispatch(pollProfilesError(e));
       }
-      pollProfiles(context, abortController, getPollInterval(context));
+      dispatch(pollProfilesThunk(abortController, Date.now() + getPollInterval(getState())));
     } else {
-      setTimeout(() => pollProfiles(context, abortController, secondsLeft - 1), 1000);
+      const secondDelta = (secondsLeft - 1) * 1000;
+      const timeoutTarget = targetTime - secondDelta - eventQueuePadding;
+      const timeoutAmount = timeoutTarget - Date.now();
+      setTimeout(() => dispatch(pollProfilesThunk(abortController, targetTime)), timeoutAmount);
     }
   }
 };

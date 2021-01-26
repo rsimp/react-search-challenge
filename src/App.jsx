@@ -6,7 +6,7 @@ import SearchPage from 'components/SearchPage';
 import Header from 'components/Header';
 import ProfilePage from 'components/ProfilePage';
 
-import { ProfilesContextProvider } from 'context/ProfilesContext';
+import { StoreProvider } from 'store';
 
 import './styles.css';
 
@@ -18,7 +18,7 @@ const Page = styled.div`
 
 function App() {
   return (
-    <ProfilesContextProvider>
+    <StoreProvider>
       <Router>
         <Page>
           <Header />
@@ -35,7 +35,7 @@ function App() {
           </Switch>
         </Page>
       </Router>
-    </ProfilesContextProvider>
+    </StoreProvider>
   );
 }
 

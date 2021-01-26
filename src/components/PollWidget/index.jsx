@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components/macro';
 import Switch from 'react-switch';
 
-import { ProfilesContext } from 'context/ProfilesContext';
-import { getAutoFetchProfiles, getPollInterval, getCountdownText } from 'context/selectors';
+import { getIsAutoFetchEnabled, getPollInterval, getCountdownText } from 'store/profiles/selectors';
 
-import { setAutoFetch } from './actions';
-import { pollProfiles } from './async';
+import { autoFetchChanged } from './actions';
+import { pollProfilesThunk } from './async';
 
 const WidgetContainer = styled.div`
   display: flex;
@@ -26,29 +26,23 @@ const Label = styled.label`
 `;
 
 export default function PollWidget(props) {
-  const context = useContext(ProfilesContext);
+  const dispatch = useDispatch();
   const abortController = useRef(new AbortController());
 
-  // hack to get around some linting rules, what I really need is something like
-  // getState, I think at this point it just makes more sense to connect in redux
-  // and use thunks (or sagas)
-  const contextRef = useRef();
-  contextRef.current = context;
-
-  const isAutoFetchEnabled = getAutoFetchProfiles(context);
-  const pollInterval = getPollInterval(context);
-  const countdownText = getCountdownText(context);
+  const isAutoFetchEnabled = useSelector(getIsAutoFetchEnabled);
+  const pollInterval = useSelector(getPollInterval);
+  const countdownText = useSelector(getCountdownText);
 
   // this seems much easier with sagas, much cleaner and safer too
   useEffect(() => {
     if (isAutoFetchEnabled) {
       abortController.current = new AbortController();
-      pollProfiles(contextRef.current, abortController.current, pollInterval);
+      dispatch(pollProfilesThunk(abortController.current, Date.now() + pollInterval));
     }
     return () => {
       abortController.current.abort();
     };
-  }, [isAutoFetchEnabled, pollInterval]);
+  }, [dispatch, isAutoFetchEnabled, pollInterval]);
 
   return (
     <WidgetContainer>
@@ -56,7 +50,7 @@ export default function PollWidget(props) {
         <span>Auto-fetch</span>
         <Switch
           disabled={props.disabled}
-          onChange={(checked) => context.dispatch(setAutoFetch(checked))}
+          onChange={(checked) => dispatch(autoFetchChanged(checked))}
           checked={isAutoFetchEnabled}
           uncheckedIcon={false}
           checkedIcon={false}

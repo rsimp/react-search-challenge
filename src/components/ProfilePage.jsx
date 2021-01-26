@@ -1,11 +1,15 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components/macro';
 
-import { ProfilesContext } from 'context/ProfilesContext';
-import { getProfileById, areProfilesLoaded, getLoadProfilesError } from 'context/selectors';
+import {
+  getProfileById,
+  getAreProfilesLoaded,
+  getLoadProfilesError,
+} from 'store/profiles/selectors';
 
-import { loadProfiles } from 'components/SearchPage/async';
+import { loadProfilesThunk } from 'components/SearchPage/async';
 import { ScreenMessage, ErrorMessage } from 'components/ScreenMessages';
 
 const Main = styled.div`
@@ -88,26 +92,31 @@ const SummaryText = styled.div`
 
 export default function ProfilePage() {
   const { id } = useParams();
-  const context = useContext(ProfilesContext);
-  const profilesLoaded = areProfilesLoaded(context);
+  const dispatch = useDispatch();
+  const areProfilesLoaded = useSelector(getAreProfilesLoaded);
+  const loadError = useSelector(getLoadProfilesError);
+  const profile = useSelector((state) => getProfileById(state, id));
 
   useEffect(() => {
-    if (!profilesLoaded) {
-      loadProfiles(context.dispatch, context);
+    if (!areProfilesLoaded) {
+      dispatch(loadProfilesThunk());
     }
-  }, []); // eslint-disable-line
+  }, [areProfilesLoaded, dispatch]);
 
-  if (!profilesLoaded) {
+  if (!areProfilesLoaded) {
     // TODO replace with a skeleton screen
     return <ScreenMessage>Loading...</ScreenMessage>;
   }
 
-  const loadError = getLoadProfilesError(context);
   if (loadError) {
     return <ErrorMessage>An error occured loading profiles</ErrorMessage>;
   }
 
-  const { photoUrl, location, age, handle } = getProfileById(context, id);
+  if (!profile) {
+    return <ScreenMessage>Profile could not be found</ScreenMessage>;
+  }
+
+  const { photoUrl, location, age, handle } = profile;
 
   return (
     <Main>

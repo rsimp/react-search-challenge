@@ -1,14 +1,14 @@
-import { getAuthToken } from 'context/selectors';
+import { getAuthToken } from 'store/login/selectors';
 
 import { requestLoadProfiles, loadProfilesSuccess, loadProfilesError } from './actions';
 
-export const loadProfiles = async (dispatch, state) => {
+export const loadProfilesThunk = () => async (dispatch, getState) => {
   dispatch(requestLoadProfiles());
   try {
     const profileBody = await fetch('/api/profiles', {
       method: 'get',
       headers: new Headers({
-        Authorization: getAuthToken(state),
+        Authorization: getAuthToken(getState()),
         'Content-Type': 'application/json',
       }),
     });
