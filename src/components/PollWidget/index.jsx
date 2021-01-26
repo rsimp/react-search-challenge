@@ -39,6 +39,12 @@ export default function PollWidget(props) {
   const pollInterval = getPollInterval(context);
   const countdownText = getCountdownText(context);
 
+  useEffect(() => {
+    return () => {
+      abortController.current.abort();
+    };
+  }, []);
+
   // this seems much easier with sagas, much cleaner and safer too
   useEffect(() => {
     abortController.current.abort();
