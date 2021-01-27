@@ -1,6 +1,6 @@
 import React from 'react';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { Provider, ReactReduxContext } from 'react-redux';
+import { Provider } from 'react-redux';
 
 import ProfilesReducer from './profiles/reducer';
 import LoginReducer from './login/reducer';
@@ -16,5 +16,3 @@ export function StoreProvider(props) {
   });
   return <Provider store={store}>{props.children}</Provider>;
 }
-
-export const StoreContext = ReactReduxContext;
